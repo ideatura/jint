@@ -112,7 +112,15 @@ public class DefaultTypeConverter : ITypeConverter
 
         if (type.IsEnum)
         {
-            var integer = System.Convert.ChangeType(value, intType, formatProvider);
+            object? integer = null;
+            try 
+            {
+                integer = System.Convert.ChangeType(value, intType, formatProvider);
+            } catch (Exception e)
+            {
+                problemMessage = e.Message;
+                return false;
+            }
             if (integer == null)
             {
                 ExceptionHelper.ThrowArgumentOutOfRangeException();
