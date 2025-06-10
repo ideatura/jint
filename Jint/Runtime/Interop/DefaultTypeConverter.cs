@@ -16,6 +16,7 @@ using Expression = System.Linq.Expressions.Expression;
 #pragma warning disable IL2070
 #pragma warning disable IL2072
 #pragma warning disable IL3050
+#pragma warning disable CA2201
 
 namespace Jint.Runtime.Interop;
 
@@ -266,7 +267,7 @@ public class DefaultTypeConverter : ITypeConverter
 
             if (propagateException && !_engine.Options.Interop.ExceptionHandler(e))
             {
-                throw;
+                throw new Exception($"Unable to convert {value} to type {type}", e);
             }
 
             problemMessage = e.Message;
