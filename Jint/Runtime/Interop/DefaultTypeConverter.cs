@@ -15,6 +15,8 @@ using Expression = System.Linq.Expressions.Expression;
 #pragma warning disable IL2070
 #pragma warning disable IL2072
 #pragma warning disable IL3050
+#pragma warning disable CA2201
+#pragma warning disable CS0168
 
 namespace Jint.Runtime.Interop;
 
@@ -259,7 +261,7 @@ public class DefaultTypeConverter : ITypeConverter
 
             if (propagateException && !_engine.Options.Interop.ExceptionHandler(e))
             {
-                throw;
+                throw new Exception($"Unable to convert {value} to type {type}", e);
             }
 
             problemMessage = e.Message;
@@ -275,20 +277,26 @@ public class DefaultTypeConverter : ITypeConverter
             return false;
         }
 
+        try {
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP
-        return Enum.TryParse(enumType, value, ignoreCase: false, out result!);
+            return Enum.TryParse(enumType, value, ignoreCase: false, out result!);
 #else
-        try
-        {
-            result = Enum.Parse(enumType, value, ignoreCase: false);
-            return true;
-        }
-        catch (ArgumentException)
-        {
+            try
+            {
+                result = Enum.Parse(enumType, value, ignoreCase: false);
+                return true;
+            }
+            catch (ArgumentException)
+            {
+                result = null!;
+                return false;
+            }
+#endif
+        } catch (Exception e) {
+            // catch any and all exceptions as it seems ArgumentException catch is not enough
             result = null!;
             return false;
         }
-#endif
     }
 
     private Func<object, Delegate> BuildTargetBinderDelegate(
