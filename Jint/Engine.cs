@@ -186,7 +186,7 @@ public sealed partial class Engine : IDisposable
 
     internal GlobalSymbolRegistry GlobalSymbolRegistry { get; } = new();
 
-    internal long CurrentMemoryUsage { get; private set; }
+    public long CurrentMemoryUsage { get; private set; }
 
     internal Options Options
     {
